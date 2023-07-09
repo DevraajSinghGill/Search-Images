@@ -1,59 +1,54 @@
-const accessKey = "SmcLP_xBeULdPf5UsE-DwiIgdGU9FVMra5JVCPlaT0w"
+const accessKey = "SmcLP_xBeULdPf5UsE-DwiIgdGU9FVMra5JVCPlaT0w";
 
-const formEl = document.querySelector("form")
-const inputEl = document.getElementById("search-input")
-const searchResults = document.querySelector(".search-results")
-const showMore = document.getElementById("show-more-button")
+const formEl = document.querySelector("form");
+const searchInputEl = document.getElementById("search-input");
+const searchResultsEl = document.querySelector(".search-results");
+const showMoreButtonEl = document.getElementById("show-more-button");
 
-let inputData = ""
+let inputData = "";
 let page = 1;
 
-async function searchImages(){
-    inputData = inputEl.value;
-    const url = 'https://api.unsplash.com/search/photos?page=${page}&query=${inputData}&client_id=${accessKey}';
+async function searchImages() {
+  inputData = searchInputEl.value;
+  const url = `https://api.unsplash.com/search/photos?page=${page}&query=${inputData}&client_id=${accessKey}`;
 
-    const response = await fetch (url);
-    const data = await response.json();
+  const response = await fetch(url);
+  const data = await response.json();
+  if (page === 1) {
+    searchResultsEl.innerHTML = "";
+  }
 
-    const results = data.results;
+  const results = data.results;
 
-    if (page === 1){
-        searchResults.innerHTMl = "";
-    }
+  results.map((result) => {
+    const imageWrapper = document.createElement("div");
+    imageWrapper.classList.add("search-result");
+    const image = document.createElement("img");
+    image.src = result.urls.small;
+    image.alt = result.alt_description;
+    const imageLink = document.createElement("a");
+    imageLink.href = result.links.html;
+    imageLink.target = "_blank";
+    imageLink.textContent = result.alt_description;
 
-    results.map((result) =>{
-        const imageWrapper = document.createElement('div');
-        imageWrapper.classList.add("search-result");
-        const image = document.createElement('img');
-        image.src = result.url.small;
-        image.alt = result.alt_description;
-        const imageLink = document.createElement('a');
-        imageLink.href = result.link.html;
-        imageLink.target = "_blank";
-        imageLink.textContent = result.alt_description;
+    imageWrapper.appendChild(image);
+    imageWrapper.appendChild(imageLink);
+    searchResultsEl.appendChild(imageWrapper);
+  });
 
-        imageWrapper.appendChild(image);
-        imageWrapper.appendChild(imageLink);
-        searchResults.appendChild(imageWrapper);
+  page++;
 
-
-
-    })
-
-    page++
-    if(page > 1){
-        showMore.style.display= "block";
-    }
+  if (page > 1) {
+    showMoreButtonEl.style.display = "block";
+  }
 }
 
 formEl.addEventListener("submit", (event) => {
-    event.preventDefault()
-    page = 1;
-    searchImages()
-})
+  event.preventDefault();
+  page = 1;
+  searchImages();
+});
 
-showMore.addEventListener("click", () => {
-    searchImages()
-})
-
-
+showMoreButtonEl.addEventListener("click", () => {
+  searchImages();
+});
